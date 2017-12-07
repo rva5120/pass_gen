@@ -20,6 +20,8 @@ import (
 	"time"
 	"github.com/pborman/getopt"
 	"bufio"
+	"strings"
+	"regexp"
 	// There will likely be several mode APIs you need
 )
 
@@ -84,9 +86,18 @@ func generatePasword(length int8, pattern string, webflag bool) string {
 	// Open the file
 	f, _ := os.Open("/usr/share/dict/words")
 	scanner := bufio.NewScanner(f)
+	dict_size := 0
+	dict := []string{}
+	// Regular expression for valid words
+	valid_word := regexp.MustCompile(`^[a-zA-Z]+$`)
 	for scanner.Scan() {
-		line := scanner.Text()
+		word := scanner.Text()
+		// store it in an array, if no special characters are present
+		if valid_word.MatchString(word) {
+			append(dict, word)
+		}
 	}
+	dict_size = len(dict)
 
 	// Generate random password accordingly
 	if pattern != "" {
@@ -135,8 +146,20 @@ func generatePasword(length int8, pattern string, webflag bool) string {
 						}
 					}
 					// Find random dictionary word of size word_length
+					// Keep generating random numbers until the word has desired length
+					not_found := true
+					for not_found {
+						rand_word_num := random_generator.Intn(dict_size)
+						if len(dict[rand_word_num]) == total_length {
+							pwd_char = dict[rand_word_num]
+							not_found = false
+						}
+					}
 				} else {
 					// Find random dictionary word of any size
+					// Generate random number and lookup dict array
+					rand_word_num := random_generator.Intn(dict_size)
+					pwd_char = dict[rand_word_num]
 				}
 
 			} else if pat == "s" {
