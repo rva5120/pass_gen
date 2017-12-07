@@ -19,8 +19,7 @@ import (
 	"strconv"
 	"time"
 	"github.com/pborman/getopt"
-	"bufio"
-	"strings"
+	"bufio"	
 	"regexp"
 	// There will likely be several mode APIs you need
 )
@@ -94,7 +93,7 @@ func generatePasword(length int8, pattern string, webflag bool) string {
 		word := scanner.Text()
 		// store it in an array, if no special characters are present
 		if valid_word.MatchString(word) {
-			append(dict, word)
+			dict = append(dict, word)
 		}
 	}
 	dict_size = len(dict)
@@ -284,10 +283,13 @@ func main() {
 	}
 
 
-	// Now generate the password and print it out
-	pwd := generatePasword(plength, *pattern, *webflag)
-	fmt.Printf("Generated password:  %s\n", pwd)
-
+	if *helpflag {
+		getopt.Usage()
+	} else {
+		// Now generate the password and print it out
+		pwd := generatePasword(plength, *pattern, *webflag)
+		fmt.Printf("Generated password:  %s\n", pwd)
+	}
 	// Return (no return code)
 	return
 }
